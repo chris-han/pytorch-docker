@@ -42,6 +42,7 @@ Note: `/path/to/project` and `/path/to/dataset` is your **own** project path and
 ## Image List (More images are on the way ~)
 
 <!-- Pytorch versions -->
+[pytorch2.2.0]: https://img.shields.io/badge/Pytorch-2.2.0-orange?logo=pytorch
 [pytorch2.0.1]: https://img.shields.io/badge/Pytorch-2.0.1-orange?logo=pytorch
 [pytorch2.0.0]: https://img.shields.io/badge/Pytorch-2.0.0-orange?logo=pytorch
 [pytorch1.13.1]: https://img.shields.io/badge/Pytorch-1.13.1-orange?logo=pytorch
@@ -65,6 +66,7 @@ Note: `/path/to/project` and `/path/to/dataset` is your **own** project path and
 [pytorch1.2.0]: https://img.shields.io/badge/Pytorch-1.2.0-orange?logo=pytorch
 
 <!-- Python versions -->
+[python3.11.5]: https://img.shields.io/badge/Python-3.11.5-blue?logo=python
 [python3.10.11]: https://img.shields.io/badge/Python-3.10.11-blue?logo=python
 [python3.9.17]: https://img.shields.io/badge/Python-3.9.17-blue?logo=python
 [python3.9.16]: https://img.shields.io/badge/Python-3.9.16-blue?logo=python
@@ -80,6 +82,7 @@ Note: `/path/to/project` and `/path/to/dataset` is your **own** project path and
 [centOS8]: https://img.shields.io/badge/CentOS-8-blue?logo=centos
 
 <!-- CUDA versions -->
+[cuda12.1]: https://img.shields.io/badge/CUDA-12.1-green?logo=nvidia
 [cuda11.8]: https://img.shields.io/badge/CUDA-11.8-green?logo=nvidia
 [cuda11.8-devel]: https://img.shields.io/badge/CUDA-11.8--devel-green?logo=nvidia
 [cuda11.7]: https://img.shields.io/badge/CUDA-11.7-green?logo=nvidia
@@ -101,6 +104,11 @@ Note: `/path/to/project` and `/path/to/dataset` is your **own** project path and
 [cpu]: https://img.shields.io/badge/CPU-amd64-lightgray
 
 <!-- order: cuda, python, os -->
+### 2.2.0
+
+| Image | Pull Command | 
+| -------------| -------------|
+| ![pytorch2.2.0] ![python3.11.5] ![cuda12.1] ![ubuntu20.04] [![](https://img.shields.io/docker/image-size/cnstark/pytorch/2.2.0-py3.11.5-cuda12.1.0-ubuntu20.04)][DockerHub] | `docker pull cnstark/pytorch:2.2.0-py3.11.5-cuda12.1.0-ubuntu20.04` |
 
 ### 2.0.1
 

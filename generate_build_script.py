@@ -11,6 +11,16 @@ from argparse import ArgumentParser
 #    }
 # }
 PYTORCH_VERSIONS = {
+    '2.2.0': {
+        'cpu': [
+            '2.2.0', 'cpu', '0.17.0', 'cpu', '2.2.0', 'cpu',
+            'https://download.pytorch.org/whl/cpu/torch_stable.html',
+        ],
+        '12.1': [
+            '2.2.0', 'cu121', '0.17.0', 'cu121', '2.2.0', 'cu121',
+            'https://download.pytorch.org/whl/cu121/torch_stable.html'
+        ],
+    },    
     '2.0.1': {
         'cpu': [
             '2.0.1', 'cpu', '0.15.2', 'cpu', '2.0.2', 'cpu',
@@ -421,6 +431,12 @@ CUDA_VERSIONS = {
         'ubuntu_available': ['18.04', '20.04', '22.04'],
         'centos_available': ['7'],
     },
+    '12.1': {
+        'version_name': '12.1.0',
+        'cudnn': '8',
+        'ubuntu_available': ['18.04', '20.04', '22.04'],
+        'centos_available': ['7'],
+    },
 }
 
 
@@ -437,6 +453,7 @@ export TORCHVISION_VERSION_SUFFIX={}
 export TORCHAUDIO_VERSION={}
 export TORCHAUDIO_VERSION_SUFFIX={}
 export PYTORCH_DOWNLOAD_URL={}
+export ULTRALYTICS_VERSION={}
 
 export IMAGE_TAG={image_tag}
 
@@ -484,7 +501,8 @@ env:
   TORCHAUDIO_VERSION: "{}"
   TORCHAUDIO_VERSION_SUFFIX: "{}"
   PYTORCH_DOWNLOAD_URL: "{}"
-
+  ULTRALYTICS_VERSION: "{}"
+  
   IMAGE_TAG: "{image_tag}"
 
 on:
@@ -508,7 +526,7 @@ jobs:
         run: docker/ubuntu/build.sh
 
       - name: Push docker image
-        run: docker push cnstark/pytorch:${{IMAGE_TAG}}
+        run: docker push tanghan6/ai:${{IMAGE_TAG}}
 """
 
 
@@ -550,7 +568,7 @@ jobs:
         run: docker/centos/build.sh
 
       - name: Push docker image
-        run: docker push cnstark/pytorch:${{IMAGE_TAG}}
+        run: docker push tanghan6/ai:${{IMAGE_TAG}}
 """
 
 
@@ -559,7 +577,7 @@ GITHUB_BUILD_YML_TEMPLATE = {
     'centos': GITHUB_BUILD_YML_TEMPLATE_CENTOS,
 }
 
-README_TEMPLATE = '| ![pytorch{}] ![python{}] ![{}] ![{}{}] [![](https://img.shields.io/docker/image-size/cnstark/pytorch/{})][DockerHub] | `docker pull cnstark/pytorch:{}` |'
+README_TEMPLATE = '| ![pytorch{}] ![python{}] ![{}] ![{}{}] [![](https://img.shields.io/docker/image-size/tanghan6/ai/{})][DockerHub] | `docker pull tanghan6/ai:{}` |'
 
 
 def generate_build_args(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor=None):
@@ -603,8 +621,8 @@ def generate_build_args(os_name, os_version, python_version, pytorch_version, cu
     return pytorch_args, kwargs
 
 
-def generate_build_sh(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor=None, save_dir='scripts'):
-    pytorch_args, kwargs = generate_build_args(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor)
+def generate_build_sh(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor=None, save_dir='scripts', ultralytics_version='8.0.221'):
+    pytorch_args, kwargs = generate_build_args(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor, ultralytics_version)
 
     content = BUILD_SH_TEMPLATE[os_name].format(*pytorch_args, **kwargs)
 
@@ -615,8 +633,8 @@ def generate_build_sh(os_name, os_version, python_version, pytorch_version, cuda
     os.system('chmod +x {}'.format(file_path))
 
 
-def generate_github_build_yml(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor=None, save_dir='.github/workflows'):
-    pytorch_args, kwargs = generate_build_args(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor)
+def generate_github_build_yml(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor=None, save_dir='.github/workflows', ultralytics_version='8.0.221'):
+    pytorch_args, kwargs = generate_build_args(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor, ultralytics_version)
 
     kwargs['name'] = kwargs['image_tag'].replace('-', '_')
     content = GITHUB_BUILD_YML_TEMPLATE[os_name].format(*pytorch_args, **kwargs)
@@ -643,10 +661,11 @@ def parse_args():
     parser.add_argument('--pytorch', help='Pytorch version.', required=True)
     parser.add_argument('--cuda', help='CUDA version, `cpu` means CPU version.', default='cpu')
     parser.add_argument('--cuda-flavor', help='CUDA flavor, `runtime` or `devel`, default is None, means use base image')
+    parser.add_argument('--ultralytics-version', help='yolo version, default is 8.0.221')
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = parse_args()
-    generate_build_sh(args.os, args.os_version, args.python, args.pytorch, args.cuda, args.cuda_flavor)
-    generate_github_build_yml(args.os, args.os_version, args.python, args.pytorch, args.cuda, args.cuda_flavor)
+    generate_build_sh(args.os, args.os_version, args.python, args.pytorch, args.cuda, args.cuda_flavor, args.ultralytics_version)
+    generate_github_build_yml(args.os, args.os_version, args.python, args.pytorch, args.cuda, args.cuda_flavor, args.ultralytics_version)
