@@ -453,7 +453,7 @@ export TORCHVISION_VERSION_SUFFIX={}
 export TORCHAUDIO_VERSION={}
 export TORCHAUDIO_VERSION_SUFFIX={}
 export PYTORCH_DOWNLOAD_URL={}
-export ULTRALYTICS_VERSION={}
+export ULTRALYTICS_VERSION={yolo_version}
 
 export IMAGE_TAG={image_tag}
 
@@ -474,6 +474,7 @@ export TORCHVISION_VERSION_SUFFIX={}
 export TORCHAUDIO_VERSION={}
 export TORCHAUDIO_VERSION_SUFFIX={}
 export PYTORCH_DOWNLOAD_URL={}
+export ULTRALYTICS_VERSION={yolo_version}
 
 export IMAGE_TAG={image_tag}
 
@@ -501,7 +502,7 @@ env:
   TORCHAUDIO_VERSION: "{}"
   TORCHAUDIO_VERSION_SUFFIX: "{}"
   PYTORCH_DOWNLOAD_URL: "{}"
-  ULTRALYTICS_VERSION: "{}"
+  ULTRALYTICS_VERSION={yolo_version}
   
   IMAGE_TAG: "{image_tag}"
 
@@ -544,7 +545,8 @@ env:
   TORCHAUDIO_VERSION: "{}"
   TORCHAUDIO_VERSION_SUFFIX: "{}"
   PYTORCH_DOWNLOAD_URL: "{}"
-
+  ULTRALYTICS_VERSION={yolo_version}
+    
   IMAGE_TAG: "{image_tag}"
 
 on:
@@ -580,22 +582,25 @@ GITHUB_BUILD_YML_TEMPLATE = {
 README_TEMPLATE = '| ![pytorch{}] ![python{}] ![{}] ![{}{}] [![](https://img.shields.io/docker/image-size/tanghan6/ai/{})][DockerHub] | `docker pull tanghan6/ai:{}` |'
 
 
-def generate_build_args(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor=None):
+def generate_build_args(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor=None, yolo_version='8.1.10'):
     if os_version not in OS_VERSIONS[os_name]:
         raise ValueError(f'OS {os_name} {os_version} is not available: choose from {OS_VERSIONS[os_name]}!')
 
     if cuda_version == 'cpu':
         base_image = '{}:{}'.format(os_name, os_version)
-        image_tag = '{}-py{}-{}{}'.format(pytorch_version, python_version, os_name, os_version)
+        image_tag = '{}-yolo{}-py{}-{}{}'.format(pytorch_version, yolo_version, python_version, os_name, os_version)
+        print('image_tag',image_tag)
     else:
         if os_version not in CUDA_VERSIONS[cuda_version][os_name + '_available']:
             raise ValueError(f'CUDA {cuda_version} is not available in {os_name} {os_version}!')
+           
         if cuda_flavor is None:
             base_image = '{}:{}'.format(os_name, os_version)
-            image_tag = '{}-py{}-cuda{}-{}{}'.format(
-                pytorch_version, python_version, CUDA_VERSIONS[cuda_version]['version_name'],
+            image_tag = '{}-yolo{}-py{}-cuda{}-{}{}'.format(
+                pytorch_version, yolo_version, python_version, CUDA_VERSIONS[cuda_version]['version_name'],
                 os_name, os_version
             )
+            print('image_tag',image_tag)
         else:
             if cuda_flavor not in ('runtime', 'devel'):
                 raise ValueError(f'CUDA flavor is not available!')
@@ -604,13 +609,15 @@ def generate_build_args(os_name, os_version, python_version, pytorch_version, cu
                 CUDA_VERSIONS[cuda_version]['version_name'], CUDA_VERSIONS[cuda_version]['cudnn'],
                 cuda_flavor, os_name, os_version
             )
-            image_tag = '{}-py{}-cuda{}-{}-{}{}'.format(
-                pytorch_version, python_version, CUDA_VERSIONS[cuda_version]['version_name'],
+            image_tag = '{}-yolo{}-py{}-cuda{}-{}-{}{}'.format(
+                pytorch_version, yolo_version, python_version, CUDA_VERSIONS[cuda_version]['version_name'],
                 cuda_flavor,os_name, os_version
             )
+            print('image_tag',image_tag)
     kwargs = {
         'base_image': base_image,
         'python_version': python_version,
+        'yolo_version': yolo_version,
         'image_tag': image_tag
     }
 
@@ -621,20 +628,21 @@ def generate_build_args(os_name, os_version, python_version, pytorch_version, cu
     return pytorch_args, kwargs
 
 
-def generate_build_sh(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor=None, save_dir='scripts', ultralytics_version='8.0.221'):
-    pytorch_args, kwargs = generate_build_args(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor, ultralytics_version)
-
+def generate_build_sh(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor=None, yolo_version='8.1.10', save_dir='scripts'):
+    pytorch_args, kwargs = generate_build_args(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor, yolo_version)
     content = BUILD_SH_TEMPLATE[os_name].format(*pytorch_args, **kwargs)
-
+    # print(content)
     file_path = os.path.join(save_dir, 'build_{}.sh'.format(kwargs['image_tag'].replace('-', '_')))
+    # print('file_path',file_path)
+    # print('save_dir',save_dir)
     with open(file_path, 'w') as f:
         f.write(content)
 
     os.system('chmod +x {}'.format(file_path))
 
 
-def generate_github_build_yml(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor=None, save_dir='.github/workflows', ultralytics_version='8.0.221'):
-    pytorch_args, kwargs = generate_build_args(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor, ultralytics_version)
+def generate_github_build_yml(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor=None,  yolo_version='8.1.10', save_dir='.github/workflows'):
+    pytorch_args, kwargs = generate_build_args(os_name, os_version, python_version, pytorch_version, cuda_version, cuda_flavor, yolo_version)
 
     kwargs['name'] = kwargs['image_tag'].replace('-', '_')
     content = GITHUB_BUILD_YML_TEMPLATE[os_name].format(*pytorch_args, **kwargs)
@@ -661,11 +669,12 @@ def parse_args():
     parser.add_argument('--pytorch', help='Pytorch version.', required=True)
     parser.add_argument('--cuda', help='CUDA version, `cpu` means CPU version.', default='cpu')
     parser.add_argument('--cuda-flavor', help='CUDA flavor, `runtime` or `devel`, default is None, means use base image')
-    parser.add_argument('--ultralytics-version', help='yolo version, default is 8.0.221')
+    parser.add_argument('--yolo-version', help='ULTRALYTICS yolo version, default is 8.1.10')  
+
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = parse_args()
-    generate_build_sh(args.os, args.os_version, args.python, args.pytorch, args.cuda, args.cuda_flavor, args.ultralytics_version)
-    generate_github_build_yml(args.os, args.os_version, args.python, args.pytorch, args.cuda, args.cuda_flavor, args.ultralytics_version)
+    generate_build_sh(args.os, args.os_version, args.python, args.pytorch, args.cuda,args.cuda_flavor, args.yolo_version)
+    generate_github_build_yml(args.os, args.os_version, args.python, args.pytorch, args.cuda, args.cuda_flavor, args.yolo_version)
