@@ -1,6 +1,10 @@
 ARG BASE_IMAGE
 
 FROM ${BASE_IMAGE}
+# RUN apt-get update && apt-get install -y sed
+
+RUN sed -i 's/archive.ubuntu.com/cn.archive.ubuntu.com/g' /etc/apt/sources.list
+
 
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
 
@@ -32,6 +36,7 @@ ARG TORCHVISION_VERSION_SUFFIX
 ARG TORCHAUDIO_VERSION
 ARG TORCHAUDIO_VERSION_SUFFIX
 ARG PYTORCH_DOWNLOAD_URL
+ARG ULTRALYTICS_VERSION
 
 RUN if [ ! $TORCHAUDIO_VERSION ]; \
     then \
@@ -53,5 +58,7 @@ RUN if [ ! $TORCHAUDIO_VERSION ]; \
             -f ${PYTORCH_DOWNLOAD_URL}; \
     fi && \
     rm -r /root/.cache/pip
+
+RUN pip install ultralytics==${ULTRALYTICS_VERSION}
 
 WORKDIR /workspace

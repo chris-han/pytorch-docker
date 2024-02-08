@@ -502,7 +502,7 @@ env:
   TORCHAUDIO_VERSION: "{}"
   TORCHAUDIO_VERSION_SUFFIX: "{}"
   PYTORCH_DOWNLOAD_URL: "{}"
-  ULTRALYTICS_VERSION={yolo_version}
+  ULTRALYTICS_VERSION= "{yolo_version}"
   
   IMAGE_TAG: "{image_tag}"
 
@@ -545,7 +545,7 @@ env:
   TORCHAUDIO_VERSION: "{}"
   TORCHAUDIO_VERSION_SUFFIX: "{}"
   PYTORCH_DOWNLOAD_URL: "{}"
-  ULTRALYTICS_VERSION={yolo_version}
+  ULTRALYTICS_VERSION= "{yolo_version}"
     
   IMAGE_TAG: "{image_tag}"
 
@@ -589,7 +589,7 @@ def generate_build_args(os_name, os_version, python_version, pytorch_version, cu
     if cuda_version == 'cpu':
         base_image = '{}:{}'.format(os_name, os_version)
         image_tag = '{}-yolo{}-py{}-{}{}'.format(pytorch_version, yolo_version, python_version, os_name, os_version)
-        print('image_tag',image_tag)
+        #print('image_tag',image_tag)
     else:
         if os_version not in CUDA_VERSIONS[cuda_version][os_name + '_available']:
             raise ValueError(f'CUDA {cuda_version} is not available in {os_name} {os_version}!')
@@ -600,7 +600,7 @@ def generate_build_args(os_name, os_version, python_version, pytorch_version, cu
                 pytorch_version, yolo_version, python_version, CUDA_VERSIONS[cuda_version]['version_name'],
                 os_name, os_version
             )
-            print('image_tag',image_tag)
+            #print('image_tag',image_tag)
         else:
             if cuda_flavor not in ('runtime', 'devel'):
                 raise ValueError(f'CUDA flavor is not available!')
@@ -613,7 +613,7 @@ def generate_build_args(os_name, os_version, python_version, pytorch_version, cu
                 pytorch_version, yolo_version, python_version, CUDA_VERSIONS[cuda_version]['version_name'],
                 cuda_flavor,os_name, os_version
             )
-            print('image_tag',image_tag)
+            #print('image_tag',image_tag)
     kwargs = {
         'base_image': base_image,
         'python_version': python_version,

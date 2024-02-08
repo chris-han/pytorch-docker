@@ -18,7 +18,10 @@ Docker Hub: https://hub.docker.com/r/cnstark/pytorch
 * 2023/05/04: Support for pytorch 2.0.
 
 ## Usage
-
+### Generate docker file
+```python
+python generate_build_script.py --os ubuntu --os-version 20.04 --python 3.11 --pytorch 2.2.0 --cuda 12.1 --cuda-flavor runtime  --yolo-version 8.1.10
+```
 ### Preparation
 
 * [Docker](https://docs.docker.com/engine/install/)
@@ -331,6 +334,7 @@ optional arguments:
 
 ```
 scripts/build_xxx.sh
+scripts/build_2.2.0_yolo8.1.10_py3.11.5_cuda12.1.0_runtime_ubuntu20.04.sh
 ```
 
 ### Commit the Version (Optional)
