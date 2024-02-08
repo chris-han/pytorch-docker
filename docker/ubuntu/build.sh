@@ -9,6 +9,6 @@ docker build \
     --build-arg TORCHAUDIO_VERSION_SUFFIX=${TORCHAUDIO_VERSION_SUFFIX} \
     --build-arg PYTORCH_DOWNLOAD_URL=${PYTORCH_DOWNLOAD_URL} \
     --build-arg ULTRALYTICS_VERSION=${ULTRALYTICS_VERSION} \
-    -t cnstark/pytorch:${IMAGE_TAG} \
+    -t tanghan6/ai:${IMAGE_TAG} \
     -f docker/ubuntu/Dockerfile \
     .
